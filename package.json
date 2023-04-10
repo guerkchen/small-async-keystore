@@ -1,6 +1,6 @@
 {
   "name": "small-async-keystore",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A small keystore for username and password, where the password is encrypted with RSA while the privat key is encrypted. This way the passwords cannot be decrypted without manual interaction.",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/guerkchen/small-async-keystore#readme",
   "dependencies": {
+    "fs": "^0.0.1-security",
     "generate-rsa-keypair": "^0.2.1",
     "jsonfile": "^6.1.0",
     "node-forge": "^1.3.1",
