@@ -4,7 +4,9 @@ const write = require('write');
 const readfile = require("read-file");
 const fs = require('fs');
 const { base64encode, base64decode } = require('nodejs-base64');
+const { Synchronized }  = require("node-synchronized");
 
+const block = new Synchronized();
 const pki = forge.pki;
 
 const keystore_filename = "keystore.secret";
@@ -55,18 +57,21 @@ function createKeypair(){
 }
 
 function insertPassword(username, password){
-    const publicKey = pki.publicKeyFromPem(readfile.sync(publickey_filename, 'utf8'));
+    block.Synchronized(first => {
+        const publicKey = pki.publicKeyFromPem(readfile.sync(publickey_filename, 'utf8'));
 
-    var keystore;
-    if(fs.existsSync(keystore_filename)){
-        keystore = jsonfile.readFileSync(keystore_filename, 'utf8');
-    } else {
-        keystore = {};
-    }
-    
-    keystore[username] = base64encode(publicKey.encrypt(password));
-    jsonfile.writeFileSync(keystore_filename, keystore, { spaces: 2, EOL: '\r\n' });
-}
+        var keystore;
+        if(fs.existsSync(keystore_filename)){
+            keystore = jsonfile.readFileSync(keystore_filename, 'utf8');
+        } else {
+            createKeypair();
+            keystore = {};
+        }
+        
+        keystore[username] = base64encode(publicKey.encrypt(password));
+        jsonfile.writeFileSync(keystore_filename, keystore, { spaces: 2, EOL: '\r\n' });
+    });
+ }
 
 async function getPassword(username){
     var keyEncryptionKeyBase64;
@@ -91,10 +96,8 @@ async function getPassword(username){
     const encryptedPrivatePem = readfile.sync(privatekey_filename, 'utf8');
     const privateKey = pki.decryptRsaPrivateKey(encryptedPrivatePem, base64decode(keyEncryptionKeyBase64));
 
-    const keystore = jsonfile.readFileSync(keystore_filename, 'utf8');
+    block.Synchronized(first => {
+        const keystore = jsonfile.readFileSync(keystore_filename, 'utf8');
+    });
     return privateKey.decrypt(base64decode(keystore[username]));
 }
-
-createKeypair();
-insertPassword("Testuser", "Testpassword");
-console.log(getPassword("Testuser"));
