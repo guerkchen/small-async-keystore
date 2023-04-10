@@ -1,6 +1,6 @@
 {
   "name": "small-async-keystore",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A small keystore for username and password, where the password is encrypted with RSA while the privat key is encrypted. This way the passwords cannot be decrypted without manual interaction.",
   "main": "index.js",
   "scripts": {
