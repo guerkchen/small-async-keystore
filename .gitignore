@@ -105,3 +105,4 @@ dist
 
 # Secret files that should not be pushed
 *.secret
+keystore/
