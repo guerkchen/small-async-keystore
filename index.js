@@ -77,10 +77,7 @@ function createKeypair(){
 
 function insertPassword(username, password){
     logger.verbose("insertPassword(${username}, ...)");
-    block.Synchronized(first => {
-        logger.debug("read publickey from file");
-        const publicKey = pki.publicKeyFromPem(readfile.sync(publickey_filename, 'utf8'));
-
+    block.synchronized(first => {
         var keystore;
         if(fs.existsSync(keystore_filename)){
             logger.debug("read keystore file");
@@ -90,6 +87,9 @@ function insertPassword(username, password){
             createKeypair();
             keystore = {};
         }
+
+        logger.debug("read publickey from file");
+        const publicKey = pki.publicKeyFromPem(readfile.sync(publickey_filename, 'utf8'));
         
         keystore[username] = base64encode(publicKey.encrypt(password));
         logger.debug("write keystore to file");
@@ -125,7 +125,7 @@ async function getPassword(username){
     const encryptedPrivatePem = readfile.sync(privatekey_filename, 'utf8');
     const privateKey = pki.decryptRsaPrivateKey(encryptedPrivatePem, base64decode(keyEncryptionKeyBase64));
 
-    block.Synchronized(first => {
+    block.synchronized(first => {
         logger.debug("read keystore from file");
         const keystore = jsonfile.readFileSync(keystore_filename, 'utf8');
     });
