@@ -2,6 +2,7 @@ const jsonfile = require('jsonfile');
 const forge = require('node-forge');
 const write = require('write');
 const readfile = require("read-file");
+const read = require("read");
 const fs = require('fs');
 const { base64encode, base64decode } = require('nodejs-base64');
 const { Synchronized }  = require("node-synchronized");
